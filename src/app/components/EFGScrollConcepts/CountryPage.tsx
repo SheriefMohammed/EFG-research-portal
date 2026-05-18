@@ -1,6 +1,8 @@
+import { useRef, useState } from 'react';
 import { ChevronDown, Download, Search } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { getCountryBySlug, slugifyCountryName, type CoveredCountry } from './countryData';
+import { useInView } from './hooks';
 
 const REPORTS = [
   {
@@ -26,10 +28,45 @@ const REPORTS = [
   },
 ];
 
-const METRICS = [
-  ['Real GDP Growth (%)', '3.2', '3.5', '3.8', '4.1', '4.3'],
-  ['Non-Oil GDP Growth (%)', '4.5', '4.8', '5.1', '5.3', '5.6'],
-  ['Oil GDP Growth (%)', '1.2', '1.4', '1.6', '2.0', '2.2'],
+const MACRO_COLUMNS = ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026'];
+
+const MACRO_PANELS = [
+  {
+    id: 'gdp',
+    title: 'GDP & Economic Growth',
+    rows: [
+      ['Real GDP Growth (%)', '3.2', '3.5', '3.8', '4.1', '4.3'],
+      ['Non-Oil GDP Growth (%)', '4.5', '4.8', '5.1', '5.3', '5.6'],
+      ['Oil GDP Growth (%)', '1.2', '1.4', '1.6', '2.0', '2.2'],
+    ],
+  },
+  {
+    id: 'inflation',
+    title: 'Inflation & Price Levels',
+    rows: [
+      ['Headline CPI (%)', '2.1', '2.4', '2.8', '3.0', '3.1'],
+      ['Core CPI (%)', '1.8', '2.0', '2.3', '2.5', '2.6'],
+      ['Food Inflation (%)', '3.4', '3.8', '4.1', '4.0', '3.7'],
+    ],
+  },
+  {
+    id: 'rates',
+    title: 'Interest Rates & Yields',
+    rows: [
+      ['Policy Rate (%)', '5.50', '5.25', '5.00', '4.75', '4.50'],
+      ['3M Interbank (%)', '5.72', '5.48', '5.22', '4.96', '4.74'],
+      ['10Y Sovereign Yield (%)', '6.10', '5.95', '5.82', '5.70', '5.58'],
+    ],
+  },
+  {
+    id: 'currency',
+    title: 'Currency & Reserves',
+    rows: [
+      ['FX Reserves (USD bn)', '39.2', '40.1', '41.0', '42.4', '43.0'],
+      ['Current Account (% GDP)', '-1.8', '-1.6', '-1.4', '-1.3', '-1.1'],
+      ['USD Exchange Rate', '3.75', '3.75', '3.75', '3.75', '3.75'],
+    ],
+  },
 ];
 
 function initials(name: string) {
@@ -56,11 +93,12 @@ function ratingFor(index: number) {
 function countryFallback(slug: string): CoveredCountry {
   return {
     code: slug.toUpperCase() || 'KSA',
-    name: slug
-      .split('-')
-      .filter(Boolean)
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(' ') || 'Saudi Arabia',
+    name:
+      slug
+        .split('-')
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ') || 'Saudi Arabia',
     companies: 0,
     stocks: 0,
     mcap: '$0B',
@@ -72,6 +110,13 @@ function countryFallback(slug: string): CoveredCountry {
 export function CountryPage() {
   const navigate = useNavigate();
   const { countrySlug = 'saudi-arabia' } = useParams();
+  const [activeMacroPanel, setActiveMacroPanel] = useState(MACRO_PANELS[0].id);
+  const convictionsRef = useRef<HTMLElement>(null);
+  const reportsRef = useRef<HTMLElement>(null);
+  const macroRef = useRef<HTMLElement>(null);
+  const convictionsInView = useInView(convictionsRef);
+  const reportsInView = useInView(reportsRef);
+  const macroInView = useInView(macroRef);
   const country = getCountryBySlug(countrySlug) || countryFallback(countrySlug);
   const companies = country.sectors.length ? country.sectors : [{ name: country.name, sector: 'Market' }];
   const tickerItems = companies.concat(companies).slice(0, 8);
@@ -79,12 +124,12 @@ export function CountryPage() {
   return (
     <main className="country-page">
       <section className="country-hero">
-        <div className="country-hero-inner">
+        <div className="country-hero-inner country-hero-reveal">
           <nav className="country-breadcrumb" aria-label="Breadcrumb">
             <Link to="/">Back to home</Link>
-            <span>›</span>
+            <span>&gt;</span>
             <Link to="/#coverage">Our Coverage</Link>
-            <span>›</span>
+            <span>&gt;</span>
             <strong>{country.name}</strong>
           </nav>
 
@@ -102,7 +147,7 @@ export function CountryPage() {
           </div>
         </div>
 
-        <div className="country-ticker" aria-label={`${country.name} market ticker`}>
+        <div className="country-ticker country-ticker-reveal" aria-label={`${country.name} market ticker`}>
           {tickerItems.map((company, index) => (
             <button
               key={`${company.name}-${index}`}
@@ -118,13 +163,17 @@ export function CountryPage() {
         </div>
       </section>
 
-      <section className="country-section">
-        <div className="country-section-header">
+      <section ref={convictionsRef} className={`country-section country-reveal-section ${convictionsInView ? 'in' : ''}`}>
+        <div className="country-section-header country-reveal-item">
           <h2>Top Convictions</h2>
         </div>
         <div className="country-conviction-grid">
           {companies.slice(0, 3).map((company, index) => (
-            <article key={company.name} className="country-conviction-card">
+            <article
+              key={company.name}
+              className="country-conviction-card country-reveal-item"
+              style={{ transitionDelay: `${120 + index * 90}ms` }}
+            >
               <div className="country-company-mark">{initials(company.name)}</div>
               <div>
                 <h3>{company.name}</h3>
@@ -137,7 +186,7 @@ export function CountryPage() {
           ))}
         </div>
 
-        <div className="country-section-header country-row-header">
+        <div className="country-section-header country-row-header country-reveal-item" style={{ transitionDelay: '390ms' }}>
           <h2>Intelligence Rows</h2>
           <div className="country-table-tools">
             <label>
@@ -154,7 +203,7 @@ export function CountryPage() {
           </div>
         </div>
 
-        <div className="country-table-wrap">
+        <div className="country-table-wrap country-reveal-item" style={{ transitionDelay: '480ms' }}>
           <table className="country-intel-table">
             <thead>
               <tr>
@@ -188,7 +237,13 @@ export function CountryPage() {
                   </td>
                   <td>
                     <svg viewBox="0 0 80 24" aria-hidden="true">
-                      <polyline points={index % 4 === 1 ? '2,7 22,11 38,9 55,18 68,15 78,20' : '2,18 22,14 38,16 55,8 68,10 78,5'} />
+                      <polyline
+                        points={
+                          index % 4 === 1
+                            ? '2,7 22,11 38,9 55,18 68,15 78,20'
+                            : '2,18 22,14 38,16 55,8 68,10 78,5'
+                        }
+                      />
                     </svg>
                   </td>
                 </tr>
@@ -198,15 +253,21 @@ export function CountryPage() {
         </div>
       </section>
 
-      <section className="country-section country-section-tight">
-        <div className="country-section-header">
+      <section ref={reportsRef} className={`country-section country-section-tight country-reveal-section ${reportsInView ? 'in' : ''}`}>
+        <div className="country-section-header country-reveal-item">
           <h2>Research Reports</h2>
-          <button type="button">View All →</button>
+          <button type="button">View All -&gt;</button>
         </div>
         <div className="country-report-grid">
           {REPORTS.concat(REPORTS.slice(0, 1)).map((report, index) => (
-            <article key={`${report.title}-${index}`} className="country-report-card">
-              <div>{index === 0 ? country.name : index === 3 ? 'Egypt' : 'United Arab Emirates'} <span>•</span> {report.date}</div>
+            <article
+              key={`${report.title}-${index}`}
+              className="country-report-card country-reveal-item"
+              style={{ transitionDelay: `${120 + index * 75}ms` }}
+            >
+              <div>
+                {index === 0 ? country.name : index === 3 ? 'Egypt' : 'United Arab Emirates'} <span>-</span> {report.date}
+              </div>
               <h3>{report.title}</h3>
               <p>{report.summary}</p>
               <footer>
@@ -224,40 +285,52 @@ export function CountryPage() {
         </div>
       </section>
 
-      <section className="country-section country-section-tight country-macro">
-        <div className="country-section-header">
+      <section
+        ref={macroRef}
+        className={`country-section country-section-tight country-macro country-reveal-section ${macroInView ? 'in' : ''}`}
+      >
+        <div className="country-section-header country-reveal-item">
           <h2>Macroeconomic Indicators</h2>
-          <button type="button">View All →</button>
+          <button type="button">View All -&gt;</button>
         </div>
-        <div className="country-accordion open">
-          <button type="button">GDP & Economic Growth <ChevronDown size={18} /></button>
-          <table>
-            <thead>
-              <tr>
-                <th>Indicator</th>
-                <th>Q1 2025</th>
-                <th>Q2 2025</th>
-                <th>Q3 2025</th>
-                <th>Q4 2025</th>
-                <th>Q1 2026</th>
-              </tr>
-            </thead>
-            <tbody>
-              {METRICS.map((row) => (
-                <tr key={row[0]}>
-                  {row.map((cell) => (
-                    <td key={cell}>{cell}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="country-reveal-item" style={{ transitionDelay: '140ms' }}>
+          {MACRO_PANELS.map((panel) => {
+            const isOpen = activeMacroPanel === panel.id;
+            return (
+              <div key={panel.id} className={`country-accordion ${isOpen ? 'open' : ''}`}>
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={`country-macro-${panel.id}`}
+                  onClick={() => setActiveMacroPanel(panel.id)}
+                >
+                  {panel.title} <ChevronDown size={18} />
+                </button>
+                <div id={`country-macro-${panel.id}`} className="country-accordion-content">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Indicator</th>
+                        {MACRO_COLUMNS.map((column) => (
+                          <th key={column}>{column}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {panel.rows.map((row) => (
+                        <tr key={row[0]}>
+                          {row.map((cell) => (
+                            <td key={cell}>{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
         </div>
-        {['Inflation & Price Levels', 'Interest Rates & Yields', 'Currency & Reserves'].map((label) => (
-          <div key={label} className="country-accordion">
-            <button type="button">{label} <ChevronDown size={18} /></button>
-          </div>
-        ))}
       </section>
     </main>
   );
