@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { useScrollProgress, range, clamp, lerp } from './hooks';
+import { COVERED, slugifyCountryName } from './countryData';
 
 function slugifyCompanyName(name: string) {
   return name
@@ -8,82 +9,6 @@ function slugifyCompanyName(name: string) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
-
-interface CoveredCountry {
-  code: string;
-  name: string;
-  companies: number;
-  mcap: string;
-  sectors: Array<{ name: string; sector: string }>;
-}
-
-const COVERED: Record<number, CoveredCountry> = {
-  818: {
-    code: 'EGY',
-    name: 'Egypt',
-    companies: 18,
-    mcap: '$42B',
-    sectors: [
-      { name: 'Commercial International Ba…', sector: 'Financial Services' },
-      { name: 'Eastern Company', sector: 'Consumer Staples' },
-      { name: 'Telecom Egypt', sector: 'Telecommunications' },
-      { name: 'Fawry for Banking', sector: 'Fintech' },
-    ],
-  },
-  682: {
-    code: 'KSA',
-    name: 'Saudi Arabia',
-    companies: 42,
-    mcap: '$680B',
-    sectors: [
-      { name: 'Saudi Aramco', sector: 'Energy' },
-      { name: 'Al Rajhi Bank', sector: 'Financial Services' },
-      { name: 'SABIC', sector: 'Materials' },
-      { name: 'STC', sector: 'Telecommunications' },
-    ],
-  },
-  414: {
-    code: 'KWT',
-    name: 'Kuwait',
-    companies: 14,
-    mcap: '$118B',
-    sectors: [
-      { name: 'Kuwait Finance House', sector: 'Financial Services' },
-      { name: 'National Bank of Kuwait', sector: 'Financial Services' },
-    ],
-  },
-  634: {
-    code: 'QAT',
-    name: 'Qatar',
-    companies: 12,
-    mcap: '$165B',
-    sectors: [
-      { name: 'Qatar National Bank', sector: 'Financial Services' },
-      { name: 'Industries Qatar', sector: 'Industrials' },
-    ],
-  },
-  784: {
-    code: 'UAE',
-    name: 'UAE',
-    companies: 24,
-    mcap: '$340B',
-    sectors: [
-      { name: 'Emirates NBD', sector: 'Financial Services' },
-      { name: 'Emaar Properties', sector: 'Real Estate' },
-      { name: 'DP World', sector: 'Industrials' },
-    ],
-  },
-  512: {
-    code: 'OMN',
-    name: 'Oman',
-    companies: 9,
-    mcap: '$28B',
-    sectors: [
-      { name: 'Bank Muscat', sector: 'Financial Services' },
-      { name: 'Oman Telecom', sector: 'Telecommunications' },
-    ],
-  },
-};
 
 const COUNTRY_LABELS: Record<number, string> = {
   792: 'TURKEY',
@@ -408,7 +333,17 @@ function HoverTooltip({ id }: { id: number }) {
   );
 }
 
-function DetailPanel({ id, onClose, onCompanyClick }: { id: number; onClose: () => void; onCompanyClick: (companyName: string) => void }) {
+function DetailPanel({
+  id,
+  onClose,
+  onCompanyClick,
+  onCountryPageClick,
+}: {
+  id: number;
+  onClose: () => void;
+  onCompanyClick: (companyName: string) => void;
+  onCountryPageClick: (countryName: string) => void;
+}) {
   const c = COVERED[id];
   const [isVisible, setIsVisible] = useState(false);
 
@@ -597,7 +532,9 @@ function DetailPanel({ id, onClose, onCompanyClick }: { id: number; onClose: () 
 
       {/* Bottom CTA */}
       <div style={{ padding: '0 28px 28px' }}>
-        <button style={{
+        <button
+          onClick={() => onCountryPageClick(c.name)}
+          style={{
           width: '100%',
           background: 'linear-gradient(135deg, #124734 0%, #0D3323 100%)',
           color: '#FFFFFF',
@@ -637,13 +574,24 @@ export function MapSafe() {
     navigate(`/company/${slugifyCompanyName(companyName)}`);
   };
 
+  const handleCountryPageClick = (countryName: string) => {
+    navigate(`/country/${slugifyCountryName(countryName)}`);
+  };
+
   return (
     <section style={{ padding: 0, background: '#F7F7F5', position: 'relative' }}>
       <div style={{ position: 'relative', background: '#FFFFFF', borderRadius: 0, padding: 0, overflow: 'hidden' }}>
         <div style={{ position: 'relative' }}>
           <RealMap hoveredId={hovered} selectedId={selected} onHover={setHovered} onSelect={setSelected} />
           {hovered && hovered !== selected && <HoverTooltip id={hovered} />}
-          {selected && <DetailPanel id={selected} onClose={() => setSelected(null)} onCompanyClick={handleCompanyClick} />}
+          {selected && (
+            <DetailPanel
+              id={selected}
+              onClose={() => setSelected(null)}
+              onCompanyClick={handleCompanyClick}
+              onCountryPageClick={handleCountryPageClick}
+            />
+          )}
         </div>
         <div style={{
           position: 'absolute',
@@ -659,3 +607,4 @@ export function MapSafe() {
     </section>
   );
 }
+
