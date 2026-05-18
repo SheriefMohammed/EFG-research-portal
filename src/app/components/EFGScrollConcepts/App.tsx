@@ -42,12 +42,12 @@ function Ticker() {
   const doubled = [...items, ...items];
 
   return (
-    <div className="ticker">
-      <div className="ticker-track">
+    <div className='ticker'>
+      <div className='ticker-track'>
         {doubled.map((t, i) => (
-          <span key={i} className="ticker-item">
-            <span className="sym">{t[0]}</span>
-            <span className="val">{t[1]}</span>
+          <span key={i} className='ticker-item'>
+            <span className='sym'>{t[0]}</span>
+            <span className='val'>{t[1]}</span>
             <span className={t[3]}>{t[2]}</span>
           </span>
         ))}
@@ -80,7 +80,7 @@ function ScrollRail({ chapters }: ScrollRailProps) {
   }, [chapters]);
 
   return (
-    <div className="scroll-rail">
+    <div className='scroll-rail'>
       {chapters.map((c, i) => (
         <div
           key={c.id}
@@ -90,7 +90,7 @@ function ScrollRail({ chapters }: ScrollRailProps) {
           }
         >
           <span>{String(i + 1).padStart(2, '0')}</span>
-          <span className="tick" />
+          <span className='tick' />
           <span>{c.label}</span>
         </div>
       ))}
@@ -104,9 +104,13 @@ interface TweakToggleProps {
   options?: string[];
 }
 
-function TweakToggle({ value, onChange, options = ['safe', 'bold'] }: TweakToggleProps) {
+function TweakToggle({
+  value,
+  onChange,
+  options = ['safe', 'bold'],
+}: TweakToggleProps) {
   return (
-    <div className="tweak-toggle">
+    <div className='tweak-toggle'>
       {options.map((opt) => (
         <button
           key={opt}
@@ -150,9 +154,9 @@ function TweaksPanel({ visible, state, setState }: TweaksPanelProps) {
   if (!visible) return null;
 
   return (
-    <div className="tweaks-panel">
+    <div className='tweaks-panel'>
       <h3>Tweaks · Section Variants</h3>
-      <div className="tweak-row">
+      <div className='tweak-row'>
         <label>Device</label>
         <TweakToggle
           value={state.device || 'desktop'}
@@ -160,7 +164,7 @@ function TweaksPanel({ visible, state, setState }: TweaksPanelProps) {
           options={['desktop', 'mobile']}
         />
       </div>
-      <div className="tweak-row">
+      <div className='tweak-row'>
         <label>Theme</label>
         <TweakToggle
           value={state.theme || 'dark'}
@@ -168,58 +172,58 @@ function TweaksPanel({ visible, state, setState }: TweaksPanelProps) {
           options={['dark', 'light']}
         />
       </div>
-      <div className="tweak-row">
+      <div className='tweak-row'>
         <label>Hero</label>
         <TweakToggle
           value={state.heroVariant}
           onChange={(v) => setState({ heroVariant: v })}
         />
       </div>
-      <div className="tweak-row">
+      <div className='tweak-row'>
         <label>Coverage</label>
         <TweakToggle
           value={state.coverageVariant}
           onChange={(v) => setState({ coverageVariant: v })}
         />
       </div>
-      <div className="tweak-row">
+      <div className='tweak-row'>
         <label>Map</label>
         <TweakToggle
           value={state.mapVariant}
           onChange={(v) => setState({ mapVariant: v })}
         />
       </div>
-      <div className="tweak-row">
+      <div className='tweak-row'>
         <label>News</label>
         <TweakToggle
           value={state.newsVariant}
           onChange={(v) => setState({ newsVariant: v })}
         />
       </div>
-      <div className="tweak-row">
+      <div className='tweak-row'>
         <label>Stats</label>
         <TweakToggle
           value={state.statsVariant}
           onChange={(v) => setState({ statsVariant: v })}
         />
       </div>
-      <div className="tweak-row">
+      <div className='tweak-row'>
         <label>Terminal</label>
         <TweakToggle
           value={state.terminalVariant}
           onChange={(v) => setState({ terminalVariant: v })}
         />
       </div>
-      <div className="tweak-row" style={{ gap: 8 }}>
+      <div className='tweak-row' style={{ gap: 8 }}>
         <button
-          className="btn btn-ghost"
+          className='btn btn-ghost'
           style={{ padding: '6px 10px', fontSize: 11 }}
           onClick={allToSafe}
         >
           All safe
         </button>
         <button
-          className="btn btn-primary"
+          className='btn btn-primary'
           style={{ padding: '6px 10px', fontSize: 11 }}
           onClick={allToBold}
         >
@@ -248,13 +252,18 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', state.theme || 'dark');
-    document.documentElement.setAttribute('data-device', state.device || 'desktop');
+    document.documentElement.setAttribute(
+      'data-device',
+      state.device || 'desktop',
+    );
   }, [state.theme, state.device]);
 
   useEffect(() => {
     if (location.hash) {
       setTimeout(() => {
-        document.querySelector(location.hash)?.scrollIntoView({ behavior: 'auto' });
+        document
+          .querySelector(location.hash)
+          ?.scrollIntoView({ behavior: 'auto' });
       }, 0);
       return;
     }
@@ -270,10 +279,13 @@ export default function App() {
     <>
       <AppHeader />
       <Routes>
-        <Route path="/search" element={<SearchResults onNavigateHome={handleNavigateHome} />} />
-        <Route path="/company/:companySlug" element={<CompanyPage />} />
-        <Route path="/country/:countrySlug" element={<CountryPage />} />
-        <Route path="*" element={<HomePage state={state} />} />
+        <Route
+          path='/search'
+          element={<SearchResults onNavigateHome={handleNavigateHome} />}
+        />
+        <Route path='/company/:companySlug' element={<CompanyPage />} />
+        <Route path='/country/:countrySlug' element={<CountryPage />} />
+        <Route path='*' element={<HomePage state={state} />} />
       </Routes>
       <AppFooter />
     </>
@@ -296,7 +308,7 @@ function HomePage({ state }: { state: typeof TWEAK_DEFAULTS }) {
     <>
       <ScrollRail chapters={chapters} />
 
-      <div id="hero" data-screen-label="01 Hero">
+      <div id='hero' data-screen-label='01 Hero'>
         {state.heroVariant === 'bold' ? <HeroBold /> : <HeroSafe />}
       </div>
 
@@ -306,27 +318,34 @@ function HomePage({ state }: { state: typeof TWEAK_DEFAULTS }) {
         </div>
       </div>
 
-      <div id="coverage" data-screen-label="02 Coverage">
+      <div id='coverage' data-screen-label='02 Coverage'>
         {state.coverageVariant === 'bold' ? <CoverageBold /> : <CoverageSafe />}
       </div>
 
-      <div id="map" data-screen-label="03 Map">
+      <div id='map' data-screen-label='03 Map'>
         <MapSafe />
+        <div className='coverage-card absolute top-16 start-0'>
+          <h3 className='ps-20'>
+            Our Coverage <span>Across MENA &</span>
+            <br />
+            <span>Frontier</span> Markets
+          </h3>
+        </div>
       </div>
 
-      <div id="news" data-screen-label="04 News">
+      <div id='news' data-screen-label='04 News'>
         {state.newsVariant === 'bold' ? <NewsBold /> : <NewsSafe />}
       </div>
 
-      <div id="stats" data-screen-label="05 Stats">
+      <div id='stats' data-screen-label='05 Stats'>
         {state.statsVariant === 'bold' ? <StatsBold /> : <StatsSafe />}
       </div>
 
-      <div id="terminal" data-screen-label="06 Terminal">
+      <div id='terminal' data-screen-label='06 Terminal'>
         {state.terminalVariant === 'bold' ? <TerminalBold /> : <TerminalSafe />}
       </div>
 
-      <div id="cta" data-screen-label="07 CTA">
+      <div id='cta' data-screen-label='07 CTA'>
         <CTASection />
       </div>
     </>
