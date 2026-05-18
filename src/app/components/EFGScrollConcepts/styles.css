@@ -21,7 +21,7 @@
   --rule: rgba(227, 227, 226, 0.14);
   --rule-strong: rgba(227, 227, 226, 0.26);
 
-  --accent: #A2AD01;           /* Lime Green — EFG secondary brand color */
+  --accent: #A2AD01 !important;           /* Lime Green — EFG secondary brand color */
   --accent-deep: #7A8501;
 
   --green: #00BC71;            /* Malachite Green — positive */

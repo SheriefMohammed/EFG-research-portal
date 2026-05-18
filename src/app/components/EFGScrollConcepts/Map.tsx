@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router';
 import { useScrollProgress, range, clamp, lerp } from './hooks';
-import { CompanyPage } from './CompanyPage';
+
+function slugifyCompanyName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 interface CoveredCountry {
   code: string;
@@ -624,32 +631,11 @@ function DetailPanel({ id, onClose, onCompanyClick }: { id: number; onClose: () 
 export function MapSafe() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
-  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleCompanyClick = (companyName: string) => {
-    setSelectedCompany(companyName);
-    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
+    navigate(`/company/${slugifyCompanyName(companyName)}`);
   };
-
-  if (selectedCompany) {
-    return (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: '#FFFFFF',
-        zIndex: 9999,
-        overflowY: 'auto',
-      }}>
-        <CompanyPage companyName={selectedCompany} onBack={() => {
-          setSelectedCompany(null);
-          setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
-        }} />
-      </div>
-    );
-  }
 
   return (
     <section style={{ padding: 0, background: '#F7F7F5', position: 'relative' }}>

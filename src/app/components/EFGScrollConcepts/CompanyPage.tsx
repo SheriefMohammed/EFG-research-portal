@@ -1,10 +1,35 @@
 import { useRef, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { useInView } from './hooks';
 import imgLogo from '../../../imports/Link→EfgHermeslogoPng/2815474073593b9f7b05f597eda18d9dd105499b.png';
 
-interface CompanyPageProps {
-  companyName: string;
-  onBack: () => void;
+const COMPANY_NAMES_BY_SLUG: Record<string, string> = {
+  'saudi-aramco': 'Saudi Aramco',
+  'al-rajhi-bank': 'Al Rajhi Bank',
+  sabic: 'SABIC',
+  stc: 'STC',
+  'commercial-international-ba': 'Commercial International Bank',
+  'commercial-international-bank': 'Commercial International Bank',
+  'eastern-company': 'Eastern Company',
+  'telecom-egypt': 'Telecom Egypt',
+  'fawry-for-banking': 'Fawry for Banking',
+  'kuwait-finance-house': 'Kuwait Finance House',
+  'national-bank-of-kuwait': 'National Bank of Kuwait',
+  'qatar-national-bank': 'Qatar National Bank',
+  'industries-qatar': 'Industries Qatar',
+  'emirates-nbd': 'Emirates NBD',
+  'emaar-properties': 'Emaar Properties',
+  'dp-world': 'DP World',
+  'bank-muscat': 'Bank Muscat',
+  'oman-telecom': 'Oman Telecom',
+};
+
+function titleFromSlug(slug = '') {
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 }
 
 const RECENT_REPORTS = [
@@ -388,8 +413,15 @@ function FinancialSummarySection() {
   );
 }
 
-export function CompanyPage({ companyName, onBack }: CompanyPageProps) {
+export function CompanyPage() {
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
+  const { companySlug = '' } = useParams();
+  const companyName = COMPANY_NAMES_BY_SLUG[companySlug] || titleFromSlug(companySlug);
+
+  const handleBackToMap = () => {
+    navigate('/#map');
+  };
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 10);
@@ -453,7 +485,7 @@ export function CompanyPage({ companyName, onBack }: CompanyPageProps) {
               <span style={{ color: 'rgba(255,255,255,0.9)' }}>Commercial International Bank</span>
             </div>
             <button
-              onClick={onBack}
+              onClick={handleBackToMap}
               style={{
                 background: 'rgba(255,255,255,0.1)',
                 border: '1px solid rgba(255,255,255,0.2)',

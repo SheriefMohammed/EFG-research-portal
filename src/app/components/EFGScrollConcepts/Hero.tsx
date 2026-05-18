@@ -1,10 +1,12 @@
 import { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { useScrollProgress, range, lerp, smooth, clamp } from './hooks';
 import { SearchDropdown } from './SearchDropdown';
 
 export function HeroSafe() {
   const pinRef = useRef<HTMLElement>(null);
   const p = useScrollProgress(pinRef);
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -27,8 +29,7 @@ export function HeroSafe() {
   }, []);
 
   const handleNavigate = (path: string) => {
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    navigate(path);
   };
 
   return (
@@ -497,6 +498,7 @@ export function AssemblingDashboard({ progress }: { progress: number }) {
 }
 
 export function HeroBold() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -512,8 +514,7 @@ export function HeroBold() {
   }, []);
 
   const handleNavigate = (path: string) => {
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    navigate(path);
   };
 
   return (

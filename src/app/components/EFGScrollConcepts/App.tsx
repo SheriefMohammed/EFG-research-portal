@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Route, Routes, useLocation, useNavigate } from 'react-router';
 import './styles.css';
 import { HeroSafe, HeroBold } from './Hero';
 import { CoverageSafe, CoverageBold } from './Coverage';
@@ -8,6 +9,7 @@ import { StatsSafe, StatsBold } from './Stats';
 import { TerminalSafe, TerminalBold } from './Terminal';
 import { CTASection } from './CTA';
 import { SearchResults } from './SearchResults';
+import { CompanyPage } from './CompanyPage';
 import imgLogo from '../../../imports/Link→EfgHermeslogoPng/2815474073593b9f7b05f597eda18d9dd105499b.png';
 
 const TWEAK_DEFAULTS = {
@@ -260,7 +262,8 @@ function TweaksPanel({ visible, state, setState }: TweaksPanelProps) {
 
 export default function App() {
   const [state] = useState(TWEAK_DEFAULTS);
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', state.theme || 'dark');
@@ -268,23 +271,30 @@ export default function App() {
   }, [state.theme, state.device]);
 
   useEffect(() => {
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    if (location.hash) {
+      setTimeout(() => {
+        document.querySelector(location.hash)?.scrollIntoView({ behavior: 'auto' });
+      }, 0);
+      return;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [location.pathname, location.hash]);
 
   const handleNavigateHome = () => {
-    window.history.pushState({}, '', '/');
-    setCurrentPath('/');
+    navigate('/');
   };
 
-  // Show search results page
-  if (currentPath === '/search') {
-    return <SearchResults onNavigateHome={handleNavigateHome} />;
-  }
+  return (
+    <Routes>
+      <Route path="/search" element={<SearchResults onNavigateHome={handleNavigateHome} />} />
+      <Route path="/company/:companySlug" element={<CompanyPage />} />
+      <Route path="*" element={<HomePage state={state} />} />
+    </Routes>
+  );
+}
 
+function HomePage({ state }: { state: typeof TWEAK_DEFAULTS }) {
   // Show home page
   const chapters = [
     { id: 'hero', label: 'Hero' },
