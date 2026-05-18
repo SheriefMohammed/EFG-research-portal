@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useScrollProgress, range, clamp, lerp } from './hooks';
 import { COVERED, slugifyCountryName } from './countryData';
+import { useNavigate } from 'react-router';
 
 function slugifyCompanyName(name: string) {
   return name
