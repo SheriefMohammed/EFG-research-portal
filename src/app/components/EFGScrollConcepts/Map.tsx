@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router';
 import { useScrollProgress, range, clamp, lerp } from './hooks';
+import { useNavigate } from 'react-router';
 
 function slugifyCompanyName(name: string) {
   return name
@@ -33,8 +33,8 @@ const COVERED: Record<number, CoveredCountry> = {
   682: {
     code: 'KSA',
     name: 'Saudi Arabia',
-    companies: 42,
-    mcap: '$680B',
+    companies: 14,
+    mcap: '$320B',
     sectors: [
       { name: 'Saudi Aramco', sector: 'Energy' },
       { name: 'Al Rajhi Bank', sector: 'Financial Services' },
@@ -94,9 +94,9 @@ const COUNTRY_LABELS: Record<number, string> = {
   887: 'YEMEN',
   729: 'SUDAN',
   434: 'LIBYA',
-  376: 'ISRAEL',
-  422: 'LEBANON',
-  48: 'BAHRAIN',
+  376: '',
+  422: '',
+  48: '',
 };
 
 const MAP_BBOX = { west: -5, east: 70, north: 45, south: 5 };
@@ -233,7 +233,7 @@ function RealMap({ hoveredId, selectedId, onHover, onSelect, revealIds }: RealMa
       <div style={{
         width: '100%',
         aspectRatio: '920/620',
-        background: '#E6EEEA',
+        background: '#DFE9E6',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -250,7 +250,7 @@ function RealMap({ hoveredId, selectedId, onHover, onSelect, revealIds }: RealMa
     H = 620;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block', background: '#E6EEEA', borderRadius: 8 }}>
+    <svg className="coverage-map-svg" viewBox={`0 0 ${W} ${H}`}>
       {features.map((f, idx) => {
         const id = f.id;
         const covered = COVERED[id];
@@ -268,14 +268,14 @@ function RealMap({ hoveredId, selectedId, onHover, onSelect, revealIds }: RealMa
         let fill,
           opacity = 1;
         if (covered) {
-          if (isSelected || isHover) fill = '#2E7D5A';
-          else fill = '#D7D9B6';
+          if (isSelected || isHover) fill = '#38A679';
+          else fill = '#DFE0BF';
           if (revealIds && !revealIds.has(id)) {
-            fill = '#ECECEC';
+            fill = '#F1F0EE';
             opacity = 0.6;
           }
         } else {
-          fill = '#ECECEC';
+          fill = '#F1F0EE';
         }
 
         return (
@@ -285,9 +285,13 @@ function RealMap({ hoveredId, selectedId, onHover, onSelect, revealIds }: RealMa
             fill={fill}
             opacity={opacity}
             stroke="#FFFFFF"
-            strokeWidth="0.8"
+            strokeWidth="1.25"
             vectorEffect="non-scaling-stroke"
-            style={{ cursor: covered ? 'pointer' : 'default', transition: 'fill 220ms ease, opacity 220ms ease' }}
+            style={{
+              cursor: covered ? 'pointer' : 'default',
+              transition: 'fill 220ms ease, opacity 220ms ease, filter 220ms ease',
+              filter: isSelected || isHover ? 'drop-shadow(0 4px 8px rgba(18,71,52,0.12))' : 'none',
+            }}
             onMouseEnter={() => covered && onHover && onHover(id)}
             onMouseLeave={() => covered && onHover && onHover(null)}
             onClick={() => covered && onSelect && onSelect(id)}
@@ -308,7 +312,7 @@ function RealMap({ hoveredId, selectedId, onHover, onSelect, revealIds }: RealMa
             fontFamily="var(--mono)"
             fontSize="11"
             fontWeight="500"
-            fill="#B8B8B8"
+            fill="#B5B6B5"
             style={{ letterSpacing: '0.12em', pointerEvents: 'none' }}
           >
             {COUNTRY_LABELS[id]}
@@ -324,26 +328,26 @@ function RealMap({ hoveredId, selectedId, onHover, onSelect, revealIds }: RealMa
         const isSelected = selectedId === id;
         const isSmall = ['KWT', 'QAT', 'UAE', 'BHR'].includes(c.code);
         const label = c.name.toUpperCase();
-        let color;
+        let color = 'white';
         let textShadow = 'none';
         let letterSpacing = '0.14em';
         let fontWeight = '700';
         
         if (isSelected || isHover) {
-          color = '#FFFFFF';
+          color = 'white';
           textShadow = '0 1px 2px rgba(0,0,0,0.25)';
           letterSpacing = '0.12em';
           fontWeight = '600';
         } else {
-          color = '#6B7340';
+          color = '#7C842A';
         }
 
         if (isSmall && !(isSelected || isHover)) {
           const w = c.code === 'KWT' ? 42 : c.code === 'UAE' ? 32 : c.code === 'QAT' ? 38 : 38;
           return (
             <g key={'l' + id} style={{ pointerEvents: 'none' }}>
-              <rect x={x - w / 2} y={y - 7} width={w} height={12} fill="#D7D9B6" stroke="#FFFFFF" strokeWidth="0.8" />
-              <text x={x} y={y + 2} textAnchor="middle" fontFamily="var(--mono)" fontSize="7.5" fontWeight="700" fill="#6B7340" style={{ letterSpacing: '0.1em' }}>
+              <rect x={x - w / 2} y={y - 7} width={w} height={12} fill="#DFE0BF" stroke="#FFFFFF" strokeWidth="1" />
+              <text x={x} y={y + 2} textAnchor="middle" fontFamily="var(--mono)" fontSize="7.5" fontWeight="700" fill="#7C842A" style={{ letterSpacing: '0.1em' }}>
                 {label}
               </text>
             </g>
@@ -384,23 +388,24 @@ function HoverTooltip({ id }: { id: number }) {
     <div style={{
       position: 'absolute',
       left: `${xPct}%`,
-      top: `${yPct + 4}%`,
-      transform: 'translate(-10%, 0)',
+      top: `${yPct - 18}%`,
+      transform: 'translate(-50%, -100%)',
       background: '#FFFFFF',
-      padding: '14px 18px',
-      border: '1px solid rgba(0,0,0,0.06)',
-      boxShadow: '0 10px 24px rgba(0,0,0,0.12)',
-      borderRadius: 4,
+      padding: '18px 22px',
+      border: '1px solid rgba(18,71,52,0.06)',
+      boxShadow: '0 14px 30px rgba(18,71,52,0.12)',
+      borderRadius: 8,
       pointerEvents: 'none',
-      minWidth: 180,
-      zIndex: 5,
+      minWidth: 184,
+      zIndex: 20,
+      animation: 'mapTooltipIn 180ms ease-out both',
     }}>
-      <div style={{ fontFamily: 'var(--serif)', fontSize: 18, color: '#1D1D1B', marginBottom: 6 }}>
+      <div style={{ fontSize: 18, color: '#1D1D1B', marginBottom: 8, fontWeight: 700 }}>
         {c.name}
       </div>
-      <div style={{ fontSize: 13, color: '#555', display: 'flex', gap: 12 }}>
+      <div style={{ fontSize: 15, color: '#1D1D1B', display: 'flex', gap: 18, whiteSpace: 'nowrap' }}>
         <span>
-          <b style={{ color: '#1D1D1B' }}>{c.companies}</b> Companies
+          <b style={{ color: '#1D1D1B', fontWeight: 700 }}>{c.companies}</b> Companies
         </span>
         <span style={{ color: '#1D1D1B', fontWeight: 600 }}>{c.mcap}</span>
       </div>
@@ -638,12 +643,12 @@ export function MapSafe() {
   };
 
   return (
-    <section style={{ padding: 0, background: '#F7F7F5', position: 'relative' }}>
-      <div style={{ position: 'relative', background: '#FFFFFF', borderRadius: 0, padding: 0, overflow: 'hidden' }}>
-        <div style={{ position: 'relative' }}>
+    <section className="coverage-map-section">
+      <div className="coverage-map-shell">
+        <div className="coverage-map-stage">
           <RealMap hoveredId={hovered} selectedId={selected} onHover={setHovered} onSelect={setSelected} />
-          {hovered && hovered !== selected && <HoverTooltip id={hovered} />}
-          {selected && <DetailPanel id={selected} onClose={() => setSelected(null)} onCompanyClick={handleCompanyClick} />}
+          {(hovered || selected) && <HoverTooltip id={(hovered || selected) as number} />}
+        {selected && <DetailPanel id={selected} onClose={() => setSelected(null)} onCompanyClick={handleCompanyClick} />}
         </div>
         <div style={{
           position: 'absolute',
