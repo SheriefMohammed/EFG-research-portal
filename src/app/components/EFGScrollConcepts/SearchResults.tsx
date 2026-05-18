@@ -122,7 +122,7 @@ export function SearchResults({ onNavigateHome }: SearchResultsProps) {
         </div>
 
         <div className="search-layout">
-          <aside className="filter-panel">
+          <aside className="filter-panel search-animate-in" style={{ animationDelay: '40ms' }}>
             <div className="filter-panel-header">
               <div>FILTER SYSTEM</div>
               <span>Institutional Filters</span>
@@ -178,7 +178,7 @@ export function SearchResults({ onNavigateHome }: SearchResultsProps) {
           </aside>
 
           <section className="search-content">
-            <form className="search-page-form" onSubmit={submitSearch}>
+            <form className="search-page-form search-animate-in" style={{ animationDelay: '100ms' }} onSubmit={submitSearch}>
               <Search size={17} />
               <input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
               <button type="submit" aria-label="Search">
@@ -186,14 +186,18 @@ export function SearchResults({ onNavigateHome }: SearchResultsProps) {
               </button>
             </form>
 
-            <p className="search-result-count">
+            <p className="search-result-count search-animate-in" style={{ animationDelay: '150ms' }}>
               {resultCount} results for <em>"{query}"</em>
             </p>
 
-            <SearchSectionHeader title="Latest Research Reports" />
+            <SearchSectionHeader title="Latest Research Reports" delay={190} />
             <div className="research-card-grid">
-              {reports.map((report) => (
-                <article className="research-card" key={report.title}>
+              {reports.map((report, index) => (
+                <article
+                  className="research-card search-card-animate"
+                  key={report.title}
+                  style={{ animationDelay: `${230 + index * 55}ms` }}
+                >
                   <div className="research-card-meta">
                     <span>{report.category}</span>
                     <span>-</span>
@@ -207,13 +211,14 @@ export function SearchResults({ onNavigateHome }: SearchResultsProps) {
               ))}
             </div>
 
-            <SearchSectionHeader title="Companies (4)" />
+            <SearchSectionHeader title="Companies (4)" delay={600} />
             <div className="company-card-grid">
-              {companies.map((company) => (
+              {companies.map((company, index) => (
                 <button
-                  className="company-result-card"
+                  className="company-result-card search-card-animate"
                   key={company.slug}
                   type="button"
+                  style={{ animationDelay: `${650 + index * 70}ms` }}
                   onClick={() => navigate(`/company/${company.slug}`)}
                 >
                   <span className="company-card-icon">
@@ -227,12 +232,17 @@ export function SearchResults({ onNavigateHome }: SearchResultsProps) {
               ))}
             </div>
 
-            <SearchSectionHeader title="Sector (7)" />
+            <SearchSectionHeader title="Sector (7)" delay={940} />
             <div className="sector-card-grid">
-              {sectors.map((sector) => {
+              {sectors.map((sector, index) => {
                 const Icon = sector.icon;
                 return (
-                  <button className="sector-card" type="button" key={sector.name}>
+                  <button
+                    className="sector-card search-card-animate"
+                    type="button"
+                    key={sector.name}
+                    style={{ animationDelay: `${990 + index * 45}ms` }}
+                  >
                     <span>
                       <Icon size={18} />
                     </span>
@@ -249,9 +259,9 @@ export function SearchResults({ onNavigateHome }: SearchResultsProps) {
   );
 }
 
-function SearchSectionHeader({ title }: { title: string }) {
+function SearchSectionHeader({ title, delay }: { title: string; delay: number }) {
   return (
-    <div className="search-section-header">
+    <div className="search-section-header search-animate-in" style={{ animationDelay: `${delay}ms` }}>
       <h1>{title}</h1>
       <button type="button">View All -&gt;</button>
     </div>
