@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useInView } from './hooks';
-import imgLogo from '../../../imports/Link→EfgHermeslogoPng/2815474073593b9f7b05f597eda18d9dd105499b.png';
 
 const COMPANY_NAMES_BY_SLUG: Record<string, string> = {
   'saudi-aramco': 'Saudi Aramco',
@@ -712,17 +711,10 @@ export function CompanyPage() {
       <FinancialSummarySection />
 
       <div style={{
-        maxWidth: 1360,
-        margin: '80px auto 0',
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '40px 56px',
-        borderTop: '1px solid rgba(29,29,27,0.10)',
-        color: 'rgba(29,29,27,0.55)',
-        fontSize: 13,
+        display: 'none',
       }}>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <img src={imgLogo} alt="EFG Hermes" style={{ height: 24, width: 'auto' }} />
+          <span>EFG Hermes</span>
           <span>EFG Hermes Research · Prototype by IKEN Technology</span>
         </div>
         <div style={{ display: 'flex', gap: 24, fontFamily: 'var(--serif)' }}>

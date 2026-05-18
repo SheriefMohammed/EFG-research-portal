@@ -111,17 +111,6 @@ export function SearchDropdown({ query, onQueryChange, onClose, onNavigate }: Se
           color: '#1D1D1B',
         }}
       >
-        <div
-          style={{
-            color: '#8A8A8A',
-            fontSize: 22,
-            lineHeight: 1,
-            marginBottom: 18,
-          }}
-        >
-          Search Container
-        </div>
-
         <form
           onSubmit={(event) => {
             event.preventDefault();

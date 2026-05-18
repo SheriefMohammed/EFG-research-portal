@@ -10,7 +10,7 @@ import { TerminalSafe, TerminalBold } from './Terminal';
 import { CTASection } from './CTA';
 import { SearchResults } from './SearchResults';
 import { CompanyPage } from './CompanyPage';
-import imgLogo from '../../../imports/Link→EfgHermeslogoPng/2815474073593b9f7b05f597eda18d9dd105499b.png';
+import { AppFooter, AppHeader } from './AppShell';
 
 const TWEAK_DEFAULTS = {
   theme: 'dark',
@@ -22,26 +22,6 @@ const TWEAK_DEFAULTS = {
   statsVariant: 'safe',
   terminalVariant: 'safe',
 };
-
-function Nav() {
-  return (
-    <nav className="nav">
-      <div className="nav-logo">
-        <img src={imgLogo} alt="EFG Hermes" style={{ height: 32, width: 'auto' }} />
-      </div>
-      <div className="nav-links">
-        <a href="#">Markets</a>
-        <a href="#">Coverage</a>
-        <a href="#">Reports</a>
-        <a href="#">Analysts</a>
-        <a href="#">About</a>
-      </div>
-      <a href="#" className="nav-cta">
-        Request access
-      </a>
-    </nav>
-  );
-}
 
 function Ticker() {
   const items = [
@@ -286,11 +266,15 @@ export default function App() {
   };
 
   return (
-    <Routes>
-      <Route path="/search" element={<SearchResults onNavigateHome={handleNavigateHome} />} />
-      <Route path="/company/:companySlug" element={<CompanyPage />} />
-      <Route path="*" element={<HomePage state={state} />} />
-    </Routes>
+    <>
+      <AppHeader />
+      <Routes>
+        <Route path="/search" element={<SearchResults onNavigateHome={handleNavigateHome} />} />
+        <Route path="/company/:companySlug" element={<CompanyPage />} />
+        <Route path="*" element={<HomePage state={state} />} />
+      </Routes>
+      <AppFooter />
+    </>
   );
 }
 
@@ -308,7 +292,6 @@ function HomePage({ state }: { state: typeof TWEAK_DEFAULTS }) {
 
   return (
     <>
-      <Nav />
       <ScrollRail chapters={chapters} />
 
       <div id="hero" data-screen-label="01 Hero">
