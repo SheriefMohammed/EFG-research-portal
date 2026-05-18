@@ -341,7 +341,6 @@ function RealMap({ hoveredId, selectedId, onHover, onSelect, revealIds }: RealMa
         } else {
           color = '#7C842A';
         }
-
         if (isSmall && !(isSelected || isHover)) {
           const w = c.code === 'KWT' ? 42 : c.code === 'UAE' ? 32 : c.code === 'QAT' ? 38 : 38;
           return (
