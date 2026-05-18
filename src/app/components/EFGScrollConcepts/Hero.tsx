@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useScrollProgress, range, lerp, smooth, clamp } from './hooks';
 import { SearchDropdown } from './SearchDropdown';
@@ -8,7 +8,7 @@ export function HeroSafe() {
   const p = useScrollProgress(pinRef);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showSearchDialog, setShowSearchDialog] = useState(false);
 
   const tHeadline = range(p, 0.0, 0.25);
   const tSplit = range(p, 0.25, 0.45);
@@ -16,17 +16,6 @@ export function HeroSafe() {
 
   const dashScale = lerp(0.82, 1.0, smooth(tUI));
   const dashOp = smooth(tUI);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('.search-container')) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -129,7 +118,8 @@ export function HeroSafe() {
                   placeholder="Search research, transcripts, filings..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setShowDropdown(true)}
+                  onFocus={() => setShowSearchDialog(true)}
+                  onClick={() => setShowSearchDialog(true)}
                   style={{
                     flex: 1,
                     border: 'none',
@@ -142,9 +132,7 @@ export function HeroSafe() {
                 />
                 <button
                   onClick={() => {
-                    if (searchQuery.trim()) {
-                      handleNavigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-                    }
+                    setShowSearchDialog(true);
                   }}
                   style={{
                     background: 'var(--accent)',
@@ -169,10 +157,11 @@ export function HeroSafe() {
                   </svg>
                 </button>
               </div>
-              {showDropdown && searchQuery.trim() && (
+              {showSearchDialog && (
                 <SearchDropdown
                   query={searchQuery}
-                  onClose={() => setShowDropdown(false)}
+                  onQueryChange={setSearchQuery}
+                  onClose={() => setShowSearchDialog(false)}
                   onNavigate={handleNavigate}
                 />
               )}
@@ -500,18 +489,7 @@ export function AssemblingDashboard({ progress }: { progress: number }) {
 export function HeroBold() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('.search-container')) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const [showSearchDialog, setShowSearchDialog] = useState(false);
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -548,7 +526,8 @@ export function HeroBold() {
                 placeholder="Search research, transcripts, filings..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setShowDropdown(true)}
+                onFocus={() => setShowSearchDialog(true)}
+                onClick={() => setShowSearchDialog(true)}
                 style={{
                   flex: 1,
                   border: 'none',
@@ -561,9 +540,7 @@ export function HeroBold() {
               />
               <button
                 onClick={() => {
-                  if (searchQuery.trim()) {
-                    handleNavigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-                  }
+                  setShowSearchDialog(true);
                 }}
                 style={{
                   background: 'var(--accent)',
@@ -588,10 +565,11 @@ export function HeroBold() {
                 </svg>
               </button>
             </div>
-            {showDropdown && searchQuery.trim() && (
+            {showSearchDialog && (
               <SearchDropdown
                 query={searchQuery}
-                onClose={() => setShowDropdown(false)}
+                onQueryChange={setSearchQuery}
+                onClose={() => setShowSearchDialog(false)}
                 onNavigate={handleNavigate}
               />
             )}

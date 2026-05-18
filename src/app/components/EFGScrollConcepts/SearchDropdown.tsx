@@ -1,51 +1,42 @@
-import { Building2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { ArrowRight, Building2, Search } from 'lucide-react';
 
 interface SearchDropdownProps {
   query: string;
+  onQueryChange: (query: string) => void;
   onClose: () => void;
   onNavigate: (path: string) => void;
 }
 
-export function SearchDropdown({ query, onClose, onNavigate }: SearchDropdownProps) {
+export function SearchDropdown({ query, onQueryChange, onClose, onNavigate }: SearchDropdownProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const displayQuery = query.trim() || 'Commercial';
+
   const companies = [
-    {
-      name: 'Commercial International Bank (Egypt)',
-      sector: 'Banks & Financials',
-      ticker: 'COMI',
-    },
-    {
-      name: 'National Bank of Egypt',
-      sector: 'Banks & Financials',
-      ticker: 'NBE',
-    },
-    {
-      name: 'Al Ahli Bank of Kuwait (Bahrain)',
-      sector: 'Banks & Financials',
-      ticker: 'ABK',
-    },
+    { name: 'Commercial International Bank (Egypt)', sector: 'Banks & Financials', ticker: 'COMI' },
+    { name: 'National Bank of Egypt', sector: 'Banks & Financials', ticker: 'NBE' },
+    { name: 'Al Ahli Bank of Kuwait (Bahrain)', sector: 'Banks & Financials', ticker: 'ABK' },
   ];
 
   const reports = [
     {
       category: 'TECH',
+      country: 'Saudi Arabia',
       date: '12 May 2024',
       title: '2024 Tech Sector Outlook: AI Integration in MENA',
       author: 'Ahmed Al-Mansour',
     },
     {
       category: 'FINANCE',
+      country: 'Saudi Arabia',
       date: '15 May 2024',
       title: 'Emerging Blockchain Trends in Middle Eastern Markets',
       author: 'Leila Hassan',
     },
   ];
 
-  const sectors = [
-    'Banks & Financials',
-    'Real Estate',
-    'Energy & Petrochemicals',
-    'Telecom & Tech',
-  ];
+  const sectors = ['Banks & Financials', 'Real Estate', 'Energy & Petrochemicals', 'Telecom & Tech'];
 
   const countries = [
     { name: 'Egypt', count: 42 },
@@ -53,8 +44,33 @@ export function SearchDropdown({ query, onClose, onNavigate }: SearchDropdownPro
     { name: 'Saudi Arabia', count: 112 },
   ];
 
+  useEffect(() => {
+    inputRef.current?.focus();
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+    };
+  }, [onClose]);
+
   const handleViewAllResults = () => {
-    onNavigate(`/search?q=${encodeURIComponent(query)}`);
+    onNavigate(`/search?q=${encodeURIComponent(displayQuery)}`);
     onClose();
   };
 
@@ -63,359 +79,322 @@ export function SearchDropdown({ query, onClose, onNavigate }: SearchDropdownPro
     onClose();
   };
 
-  return (
+  return createPortal(
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
       style={{
-        position: 'absolute',
-        top: 'calc(100% + 8px)',
-        left: 0,
-        right: 0,
-        background: 'rgba(255, 255, 255, 0.98)',
-        backdropFilter: 'blur(20px)',
-        borderRadius: 8,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-        maxHeight: '80vh',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 3000,
+        background: 'rgba(29, 29, 27, 0.22)',
+        backdropFilter: 'blur(1px)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        padding: '16px min(18px, 4vw)',
         overflowY: 'auto',
-        zIndex: 1000,
       }}
     >
-      <div style={{ padding: '24px' }}>
-        {/* Companies Section */}
-        <div style={{ marginBottom: 24 }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 12,
-            }}
-          >
-            <h3
-              style={{
-                fontSize: 14,
-                color: '#124734',
-                fontFamily: 'var(--serif)',
-              }}
-            >
-              Companies
-            </h3>
-            <button
-              onClick={handleViewAllResults}
-              style={{
-                fontSize: 12,
-                color: '#A2AD01',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'var(--serif)',
-              }}
-            >
-              View All
-            </button>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {companies.map((company, i) => (
-              <div
-                key={i}
-                onClick={() => handleCompanyClick(company.ticker)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '10px 12px',
-                  background: '#F9F9F9',
-                  borderRadius: 4,
-                  cursor: 'pointer',
-                  transition: 'background 0.2s',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#F0F0F0')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#F9F9F9')}
-              >
-                <Building2 size={16} color="#666" />
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      color: '#1D1D1B',
-                      fontFamily: 'var(--serif)',
-                    }}
-                  >
-                    {company.name}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#999' }}>
-                    {company.sector}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div
+        className="search-dialog"
+        onMouseDown={(event) => event.stopPropagation()}
+        style={{
+          width: 'min(900px, 100%)',
+          marginTop: 'min(8vh, 42px)',
+          color: '#1D1D1B',
+        }}
+      >
+        <div
+          style={{
+            color: '#8A8A8A',
+            fontSize: 22,
+            lineHeight: 1,
+            marginBottom: 18,
+          }}
+        >
+          Search Container
         </div>
 
-        {/* Research Reports Section */}
-        <div style={{ marginBottom: 24 }}>
-          <div
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleViewAllResults();
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'rgba(255,255,255,0.98)',
+            borderRadius: 10,
+            padding: '5px 6px 5px 24px',
+            marginBottom: 32,
+            boxShadow: '0 1px 0 rgba(0,0,0,0.08), 0 12px 30px rgba(0,0,0,0.08)',
+          }}
+        >
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Search research, companies, sectors..."
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
             style={{
+              flex: 1,
+              minWidth: 0,
+              border: 'none',
+              background: 'transparent',
+              fontSize: 13,
+              color: '#1D1D1B',
+              outline: 'none',
+              padding: '13px 0',
+            }}
+          />
+          <button
+            type="submit"
+            aria-label="Search"
+            style={{
+              width: 46,
+              height: 46,
+              background: '#A2AD01',
+              border: 'none',
+              borderRadius: 8,
+              cursor: 'pointer',
               display: 'flex',
-              justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: 12,
+              justifyContent: 'center',
+              flex: '0 0 auto',
             }}
           >
-            <h3
-              style={{
-                fontSize: 14,
-                color: '#124734',
-                fontFamily: 'var(--serif)',
-              }}
-            >
-              Research Reports
-            </h3>
-            <button
-              onClick={handleViewAllResults}
-              style={{
-                fontSize: 12,
-                color: '#A2AD01',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'var(--serif)',
-              }}
-            >
-              View Library
-            </button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            {reports.map((report, i) => (
-              <div
-                key={i}
-                style={{
-                  padding: '14px',
-                  background: '#F9F9F9',
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                  transition: 'background 0.2s',
-                }}
-                onClick={handleViewAllResults}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#F0F0F0')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#F9F9F9')}
-              >
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                  <span
-                    style={{
-                      fontSize: 9,
-                      color: '#A2AD01',
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {report.category}
-                  </span>
-                  <span style={{ fontSize: 9, color: '#999' }}>·</span>
-                  <span style={{ fontSize: 9, color: '#999' }}>
-                    {report.date}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: 13,
-                    color: '#1D1D1B',
-                    fontFamily: 'var(--serif)',
-                    marginBottom: 6,
-                  }}
-                >
-                  {report.title}
-                </div>
-                <div style={{ fontSize: 11, color: '#666' }}>
-                  By {report.author}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+            <Search size={22} color="white" />
+          </button>
+        </form>
 
-        {/* Sectors and Countries Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-          {/* Sectors Section */}
-          <div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 12,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 14,
-                  color: '#124734',
-                  fontFamily: 'var(--serif)',
-                }}
-              >
-                Sectors
-              </h3>
-              <button
-                onClick={handleViewAllResults}
-                style={{
-                  fontSize: 12,
-                  color: '#A2AD01',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: 'var(--serif)',
-                }}
-              >
-                View All
-              </button>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {sectors.map((sector, i) => (
-                <button
-                  key={i}
-                  onClick={handleViewAllResults}
-                  style={{
-                    padding: '8px 16px',
-                    background: '#A2AD01',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 20,
-                    fontSize: 12,
-                    cursor: 'pointer',
-                    fontFamily: 'var(--serif)',
-                    transition: 'opacity 0.2s',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
-                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-                >
-                  {sector}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Countries Section */}
-          <div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 12,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 14,
-                  color: '#124734',
-                  fontFamily: 'var(--serif)',
-                }}
-              >
-                Countries
-              </h3>
-              <button
-                onClick={handleViewAllResults}
-                style={{
-                  fontSize: 12,
-                  color: '#A2AD01',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: 'var(--serif)',
-                }}
-              >
-                View All
-              </button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {countries.map((country, i) => (
-                <div
-                  key={i}
-                  onClick={handleViewAllResults}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '8px 12px',
-                    cursor: 'pointer',
-                    borderRadius: 4,
-                    transition: 'background 0.2s',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#F9F9F9')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <div
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.98)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: 16,
+            boxShadow: '0 24px 70px rgba(0,0,0,0.20)',
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ padding: '28px 32px 24px' }}>
+            <div style={{ marginBottom: 26 }}>
+              <SectionHeader title="Companies" action="View All ->" onClick={handleViewAllResults} />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {companies.map((company, i) => (
+                  <button
+                    key={company.ticker}
+                    onClick={() => handleCompanyClick(company.ticker)}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 8,
+                      gap: 12,
+                      padding: '12px',
+                      border: 'none',
+                      borderBottom: i === companies.length - 1 ? 'none' : '1px solid #EAEAEA',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      width: '100%',
                     }}
                   >
-                    <div
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: '50%',
-                        background: '#124734',
-                      }}
-                    />
+                    <Building2 size={15} color="#8A8A8A" />
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: 13,
+                          color: '#124734',
+                          fontFamily: 'var(--serif)',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {company.name}
+                      </span>
+                      <span style={{ display: 'block', fontSize: 11, color: '#8A8A8A' }}>{company.sector}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 28 }}>
+              <SectionHeader title="Research Reports" action="View Library ->" onClick={handleViewAllResults} />
+              <div className="search-dialog-report-grid">
+                {reports.map((report) => (
+                  <button
+                    key={report.title}
+                    onClick={handleViewAllResults}
+                    style={{
+                      padding: '18px 20px',
+                      background: '#F1F1F1',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span style={{ display: 'flex', gap: 8, marginBottom: 8, minWidth: 0 }}>
+                      <span style={tagStyle}>{report.category}</span>
+                      <span style={{ fontSize: 9, color: '#999' }}>-</span>
+                      <span style={tagStyle}>{report.country}</span>
+                      <span style={{ fontSize: 9, color: '#999' }}>-</span>
+                      <span style={{ fontSize: 9, color: '#999' }}>{report.date}</span>
+                    </span>
                     <span
                       style={{
+                        display: 'block',
                         fontSize: 13,
-                        color: '#1D1D1B',
+                        color: '#124734',
                         fontFamily: 'var(--serif)',
+                        marginBottom: 8,
+                        lineHeight: 1.3,
                       }}
                     >
-                      {country.name}
+                      {report.title}
                     </span>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: '#999',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {country.count} Companies
-                  </span>
+                    <span style={{ display: 'block', fontSize: 11, color: '#8A8A8A' }}>By {report.author}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="search-dialog-bottom-grid">
+              <div>
+                <SectionHeader title="Sectors" action="View All ->" onClick={handleViewAllResults} />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                  {sectors.map((sector) => (
+                    <button
+                      key={sector}
+                      onClick={handleViewAllResults}
+                      style={{
+                        padding: '8px 16px',
+                        background: '#A2AD01',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 999,
+                        fontSize: 11,
+                        cursor: 'pointer',
+                        fontFamily: 'var(--serif)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {sector}
+                    </button>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <div>
+                <SectionHeader title="Countries" action="View All ->" onClick={handleViewAllResults} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {countries.map((country, i) => (
+                    <button
+                      key={country.name}
+                      onClick={handleViewAllResults}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '8px 0',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        gap: 12,
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                        <span
+                          style={{
+                            width: 16,
+                            height: 16,
+                            borderRadius: '50%',
+                            background: i === 0 ? '#2A2115' : i === 1 ? '#124734' : '#006B45',
+                            boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.16)',
+                            flex: '0 0 auto',
+                          }}
+                        />
+                        <span style={{ fontSize: 13, color: '#1D1D1B', fontFamily: 'var(--serif)', whiteSpace: 'nowrap' }}>
+                          {country.name}
+                        </span>
+                      </span>
+                      <span style={{ fontSize: 11, color: '#9A9A9A', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                        {country.count} Companies
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
+
+          <button
+            onClick={handleViewAllResults}
+            style={{
+              width: '100%',
+              padding: '24px 20px',
+              background: '#124734',
+              color: 'white',
+              border: 'none',
+              borderRadius: 0,
+              fontSize: 14,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              fontFamily: 'var(--serif)',
+            }}
+          >
+            View all results for "{displayQuery}"
+            <ArrowRight size={16} />
+          </button>
         </div>
       </div>
+    </div>,
+    document.body
+  );
+}
 
-      {/* Bottom CTA */}
-      <div
+function SectionHeader({ title, action, onClick }: { title: string; action: string; onClick: () => void }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 14,
+      }}
+    >
+      <h3 style={{ fontSize: 14, color: '#124734', fontFamily: 'var(--serif)', margin: 0 }}>{title}</h3>
+      <button
+        onClick={onClick}
         style={{
-          borderTop: '1px solid #E0E0E0',
-          padding: '16px 24px',
+          fontSize: 12,
+          color: '#A2AD01',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          fontFamily: 'var(--serif)',
         }}
       >
-        <button
-          onClick={handleViewAllResults}
-          style={{
-            width: '100%',
-            padding: '14px',
-            background: '#124734',
-            color: 'white',
-            border: 'none',
-            borderRadius: 4,
-            fontSize: 14,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            fontFamily: 'var(--serif)',
-            transition: 'background 0.2s',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = '#0F3A29')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = '#124734')}
-        >
-          View all results for "{query}"
-          <span style={{ fontSize: 18 }}>→</span>
-        </button>
-      </div>
+        {action}
+      </button>
     </div>
   );
 }
+
+const tagStyle = {
+  fontSize: 9,
+  color: '#A2AD01',
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+} as const;

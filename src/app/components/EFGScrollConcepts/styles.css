@@ -527,3 +527,27 @@ h2.section-title {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
+
+.search-dialog-report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.search-dialog-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+}
+
+@media (max-width: 640px) {
+  .search-dialog {
+    margin-top: 0 !important;
+  }
+
+  .search-dialog-report-grid,
+  .search-dialog-bottom-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+}
