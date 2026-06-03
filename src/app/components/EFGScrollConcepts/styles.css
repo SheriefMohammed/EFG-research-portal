@@ -2672,6 +2672,59 @@ h2.section-title {
   animation: sectorHeroShift 14s ease-in-out infinite alternate;
 }
 
+.sector-hero-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sector-hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(18px);
+  opacity: 0.7;
+  mix-blend-mode: screen;
+  animation: sectorOrbFloat 12s ease-in-out infinite;
+}
+
+.sector-hero-orb.orb-a {
+  top: -20px;
+  right: 12%;
+  width: 180px;
+  height: 180px;
+  background: rgba(255, 255, 255, 0.11);
+  animation-delay: 0s;
+}
+
+.sector-hero-orb.orb-b {
+  top: 44px;
+  left: 24%;
+  width: 110px;
+  height: 110px;
+  background: rgba(162, 173, 1, 0.18);
+  animation-delay: 2.4s;
+}
+
+.sector-hero-orb.orb-c {
+  bottom: 12px;
+  right: 30%;
+  width: 150px;
+  height: 150px;
+  background: rgba(18, 71, 52, 0.3);
+  animation-delay: 4.2s;
+}
+
+.sector-hero-scanline {
+  position: absolute;
+  inset: auto 0 18px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.25) 18%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.25) 82%, transparent 100%);
+  opacity: 0.55;
+  transform: translateX(-30%);
+  animation: sectorScanline 8s ease-in-out infinite;
+}
+
 .sector-hero::before {
   content: '';
   position: absolute;
@@ -2715,6 +2768,37 @@ h2.section-title {
   }
   to {
     background-position: 100% 50%;
+  }
+}
+
+@keyframes sectorOrbFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, 14px, 0) scale(1.08);
+  }
+}
+
+@keyframes sectorScanline {
+  0% {
+    transform: translateX(-35%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(20%);
+    opacity: 0.8;
+  }
+  82% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(35%);
+    opacity: 0;
   }
 }
 
@@ -2766,6 +2850,61 @@ h2.section-title {
   text-wrap: balance;
 }
 
+.sector-hero-lede {
+  max-width: 520px;
+  margin: 16px 0 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.sector-hero-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.sector-hero-metric {
+  min-width: 142px;
+  padding: 14px 16px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 10px 24px rgba(11, 34, 24, 0.14);
+  backdrop-filter: blur(10px);
+  animation: sectorMetricFloat 5.5s ease-in-out infinite;
+}
+
+.sector-hero-metric strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1;
+  color: #fff;
+}
+
+.sector-hero-metric small {
+  display: block;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@keyframes sectorMetricFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 .sector-ticker.ticker {
   position: relative;
   z-index: 1;
@@ -2778,7 +2917,7 @@ h2.section-title {
 
 .sector-ticker .ticker-track {
   gap: 0;
-  animation-duration: 44s;
+  animation-duration: 36s;
 }
 
 .sector-ticker-item {
@@ -2788,6 +2927,8 @@ h2.section-title {
   color: #fff;
   font-size: 11px;
   letter-spacing: 0.01em;
+  position: relative;
+  overflow: hidden;
 }
 
 .sector-ticker-name {
@@ -2893,6 +3034,20 @@ h2.section-title {
     background 220ms ease,
     box-shadow 220ms ease,
     border-color 220ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.sector-universe-card::before,
+.sector-report-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.58) 42%, transparent 68%);
+  opacity: 0;
+  transform: translateX(-120%);
+  transition: opacity 220ms ease, transform 520ms cubic-bezier(.2,.7,.2,1);
+  pointer-events: none;
 }
 
 .sector-universe-card:hover {
@@ -2900,6 +3055,12 @@ h2.section-title {
   background: #fff;
   border-color: rgba(18, 71, 52, 0.14);
   box-shadow: 0 18px 42px rgba(18, 71, 52, 0.08);
+}
+
+.sector-universe-card:hover::before,
+.sector-report-card:hover::before {
+  opacity: 1;
+  transform: translateX(120%);
 }
 
 .sector-universe-card-top {
@@ -2922,6 +3083,7 @@ h2.section-title {
     transform 220ms ease,
     background 220ms ease,
     color 220ms ease;
+  animation: sectorIconBob 4.5s ease-in-out infinite;
 }
 
 .sector-universe-card:hover .sector-card-icon {
@@ -2936,6 +3098,22 @@ h2.section-title {
   font-size: 9px;
   letter-spacing: 0.08em;
   white-space: nowrap;
+  position: relative;
+  padding-left: 12px;
+}
+
+.sector-card-update::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a2ad01;
+  box-shadow: 0 0 0 0 rgba(162, 173, 1, 0.5);
+  transform: translateY(-50%);
+  animation: sectorDotPulse 2.4s ease-in-out infinite;
 }
 
 .sector-universe-card-body {
@@ -2977,6 +3155,8 @@ h2.section-title {
     transform 220ms ease,
     box-shadow 220ms ease,
     border-color 220ms ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .sector-report-card:hover {
@@ -2992,10 +3172,24 @@ h2.section-title {
   font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  position: relative;
+  padding-left: 10px;
 }
 
 .sector-report-meta span {
   color: #d3d5a8;
+}
+
+.sector-report-meta::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #a2ad01;
+  transform: translateY(-50%);
 }
 
 .sector-report-card h3 {
@@ -3049,6 +3243,35 @@ h2.section-title {
   font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
+  position: relative;
+  transition: transform 220ms ease, color 220ms ease;
+}
+
+.sector-report-footer button:hover {
+  transform: translateX(4px);
+  color: #12946f;
+}
+
+@keyframes sectorIconBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes sectorDotPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(162, 173, 1, 0.44);
+    opacity: 0.9;
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(162, 173, 1, 0);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 1080px) {
@@ -3077,6 +3300,9 @@ h2.section-title {
 
   .sector-hero,
   .sector-hero-reveal,
+  .sector-hero-orb,
+  .sector-hero-scanline,
+  .sector-hero-metric,
   .sector-ticker .ticker-track {
     animation: none;
   }
@@ -3102,7 +3328,8 @@ h2.section-title {
   .sector-universe-card,
   .sector-card-icon,
   .sector-report-card,
-  .sector-report-footer button {
+  .sector-report-footer button,
+  .sector-card-update::before {
     transition: none;
   }
 }

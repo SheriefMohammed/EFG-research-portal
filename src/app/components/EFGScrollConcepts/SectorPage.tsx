@@ -73,6 +73,12 @@ const SECTOR_REPORTS = [
   },
 ];
 
+const HERO_METRICS = [
+  { value: '09', label: 'Active sectors' },
+  { value: '448', label: 'Published reports' },
+  { value: '24', label: 'Analyst teams' },
+];
+
 function TickerStrip() {
   const items = [...SECTOR_TICKER, ...SECTOR_TICKER];
 
@@ -103,6 +109,13 @@ export function SectorPage() {
   return (
     <main className="sector-page">
       <section className="sector-hero">
+        <div className="sector-hero-ambient" aria-hidden="true">
+          <span className="sector-hero-orb orb-a" />
+          <span className="sector-hero-orb orb-b" />
+          <span className="sector-hero-orb orb-c" />
+          <span className="sector-hero-scanline" />
+        </div>
+
         <div className="sector-hero-inner sector-hero-reveal">
           <nav className="sector-breadcrumb" aria-label="Breadcrumb">
             <Link to="/">Home</Link>
@@ -115,6 +128,23 @@ export function SectorPage() {
             <br />
             Across MENA
           </h1>
+
+          <p className="sector-hero-lede">
+            A live view of the most active sector calls, market movers, and report flow across the region.
+          </p>
+
+          <div className="sector-hero-metrics" aria-label="Sector overview metrics">
+            {HERO_METRICS.map((metric, index) => (
+              <div
+                key={metric.label}
+                className="sector-hero-metric"
+                style={{ animationDelay: `${index * 180}ms` }}
+              >
+                <strong>{metric.value}</strong>
+                <small>{metric.label}</small>
+              </div>
+            ))}
+          </div>
         </div>
 
         <TickerStrip />
