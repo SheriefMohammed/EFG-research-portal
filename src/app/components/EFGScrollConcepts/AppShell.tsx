@@ -15,9 +15,22 @@ export function AppHeader() {
   const navItems = [
     { label: 'Home', to: '/' },
     { label: 'Our Coverage', to: '/#coverage' },
-    { label: 'Sectors', to: '/#map' },
+    { label: 'Sectors', to: '/sectors' },
     { label: 'Research Library', to: '/search?q=Saudi%20banks' },
   ];
+
+  const isActive = (to: string) => {
+    if (to === '/') {
+      return location.pathname === '/';
+    }
+
+    if (to.startsWith('/#')) {
+      return location.pathname === '/' && location.hash === to.slice(1);
+    }
+
+    const [path] = to.split('?');
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   return (
     <>
@@ -32,7 +45,7 @@ export function AppHeader() {
               <Link
                 key={item.label}
                 to={item.to}
-                className={location.pathname === item.to ? 'active' : ''}
+                className={isActive(item.to) ? 'active' : ''}
               >
                 {item.label}
               </Link>

@@ -11,6 +11,7 @@ import { CTASection } from './CTA';
 import { SearchResults } from './SearchResults';
 import { CompanyPage } from './CompanyPage';
 import { CountryPage } from './CountryPage';
+import { SectorPage } from './SectorPage';
 import { AppFooter, AppHeader } from './AppShell';
 
 const TWEAK_DEFAULTS = {
@@ -285,6 +286,7 @@ export default function App() {
         />
         <Route path='/company/:companySlug' element={<CompanyPage />} />
         <Route path='/country/:countrySlug' element={<CountryPage />} />
+        <Route path='/sectors' element={<SectorPage />} />
         <Route path='*' element={<HomePage state={state} />} />
       </Routes>
       <AppFooter />
