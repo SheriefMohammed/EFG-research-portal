@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { Banknote, Building2, Factory, HeartPulse, Home, Pickaxe, Smartphone, type LucideIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
+import { analystPathFor } from './analystData';
 import { useInView } from './hooks';
 
 type TickerItem = {
@@ -209,7 +210,16 @@ export function SectorPage() {
             <article
               key={`${report.title}-${index}`}
               className="sector-report-card sector-reveal-item"
-              style={{ transitionDelay: `${110 + index * 80}ms` }}
+              style={{ transitionDelay: `${110 + index * 80}ms`, cursor: 'pointer' }}
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(analystPathFor(report.analyst))}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  navigate(analystPathFor(report.analyst));
+                }
+              }}
             >
               <div className="sector-report-meta">
                 {report.country} <span>-</span> {report.date}
@@ -221,7 +231,7 @@ export function SectorPage() {
                   {report.analyst}
                   <small>{report.sector}</small>
                 </span>
-                <button type="button">Download PDF</button>
+                <button type="button" onClick={(event) => event.stopPropagation()}>Download PDF</button>
               </footer>
             </article>
           ))}

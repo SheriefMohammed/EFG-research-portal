@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { ChevronDown, Download, Search } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router';
+import { analystPathFor } from './analystData';
 import { getCountryBySlug, slugifyCountryName, type CoveredCountry } from './countryData';
 import { useInView } from './hooks';
 
@@ -263,7 +264,16 @@ export function CountryPage() {
             <article
               key={`${report.title}-${index}`}
               className="country-report-card country-reveal-item"
-              style={{ transitionDelay: `${120 + index * 75}ms` }}
+              style={{ transitionDelay: `${120 + index * 75}ms`, cursor: 'pointer' }}
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(analystPathFor(report.analyst))}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  navigate(analystPathFor(report.analyst));
+                }
+              }}
             >
               <div>
                 {index === 0 ? country.name : index === 3 ? 'Egypt' : 'United Arab Emirates'} <span>-</span> {report.date}
@@ -275,7 +285,7 @@ export function CountryPage() {
                   {report.analyst}
                   <small>{report.sector}</small>
                 </span>
-                <button type="button">
+                <button type="button" onClick={(event) => event.stopPropagation()}>
                   <Download size={14} />
                   Download PDF
                 </button>

@@ -2560,6 +2560,30 @@ h2.section-title {
   cursor: pointer;
 }
 
+.analyst-report-card {
+  min-height: 198px;
+  padding: 22px 20px;
+}
+
+.analyst-report-card > div {
+  margin-bottom: 10px;
+}
+
+.analyst-report-card h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.analyst-report-card p {
+  margin: 0 0 16px;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.analyst-report-card footer {
+  padding-top: 12px;
+}
+
 .country-accordion {
   margin-bottom: 14px;
   border: 1px solid #dfe4e2;

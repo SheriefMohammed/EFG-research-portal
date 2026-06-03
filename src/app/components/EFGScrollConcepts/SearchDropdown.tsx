@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowRight, Building2, Search } from 'lucide-react';
+import { analystPathFor } from './analystData';
 
 interface SearchDropdownProps {
   query: string;
@@ -76,6 +77,11 @@ export function SearchDropdown({ query, onQueryChange, onClose, onNavigate }: Se
 
   const handleCompanyClick = (ticker: string) => {
     onNavigate(`/company/${ticker}`);
+    onClose();
+  };
+
+  const handleReportClick = (author: string) => {
+    onNavigate(analystPathFor(author));
     onClose();
   };
 
@@ -221,7 +227,7 @@ export function SearchDropdown({ query, onQueryChange, onClose, onNavigate }: Se
                 {reports.map((report) => (
                   <button
                     key={report.title}
-                    onClick={handleViewAllResults}
+                    onClick={() => handleReportClick(report.author)}
                     style={{
                       padding: '18px 20px',
                       background: '#F1F1F1',

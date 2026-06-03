@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { analystPathFor } from './analystData';
 import { useInView } from './hooks';
 
 const COMPANY_NAMES_BY_SLUG: Record<string, string> = {
@@ -130,6 +131,15 @@ function RecentReportsSection() {
               e.currentTarget.style.transform = 'translateY(0) scale(1)';
               e.currentTarget.style.background = 'rgba(18, 71, 52, 0.4)';
             }}
+            onClick={() => navigate(analystPathFor(report.analyst))}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                navigate(analystPathFor(report.analyst));
+              }
+            }}
+            tabIndex={0}
+            role="button"
             >
               <div style={{
                 fontFamily: 'var(--serif)',

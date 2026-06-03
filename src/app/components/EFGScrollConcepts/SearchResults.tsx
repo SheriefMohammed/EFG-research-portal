@@ -12,6 +12,7 @@ import {
   Search,
   Smartphone,
 } from 'lucide-react';
+import { analystPathFor } from './analystData';
 
 interface SearchResultsProps {
   onNavigateHome: () => void;
@@ -196,8 +197,17 @@ export function SearchResults({ onNavigateHome }: SearchResultsProps) {
                 <article
                   className="research-card search-card-animate"
                   key={report.title}
-                  style={{ animationDelay: `${230 + index * 55}ms` }}
-                >
+                  style={{ animationDelay: `${230 + index * 55}ms`, cursor: 'pointer' }}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigate(analystPathFor(report.author))}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      navigate(analystPathFor(report.author));
+                    }
+                  }}
+                  >
                   <div className="research-card-meta">
                     <span>{report.category}</span>
                     <span>-</span>
